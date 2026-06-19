@@ -37,14 +37,14 @@ function createNoteHTML(note) {
         <div class="note-card ${note.colorClass}">
             <div class="note-header">
                 <h3>${note.title}</h3>
-                <button class="pin-btn ${note.pinned ? 'pinned' : ''}" onclick="togglePin(${note.id})">
+                <button class="pin-btn ${note.pinned ? 'pinned' : ''}" onclick="togglePin('${note.id}')">
                     <i class="${pinClass}"></i>
                 </button>
             </div>
             <p class="note-content">${note.content}</p>
             <div class="note-footer">
                 <span class="note-date">${note.date}</span>
-                <button class="delete-btn" onclick="deleteNote(${note.id})">
+                <button class="delete-btn" onclick="deleteNote('${note.id}')">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
@@ -128,9 +128,38 @@ window.togglePin = function(id) {
     renderNotes();
 };
 
-window.deleteNote = function(id) {
-    notes = notes.filter(note => note.id !== id);
-    renderNotes();
+window.deleteNote = async function(id) {
+    console.log("Deleting note id:", id);
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        alert('Please login first');
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `https://noteit-backend-ekdi.onrender.com/notes/${id}`, 
+            {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': token
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+            loadNotes();
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error deleting note');
+    }
 };
 
 async function saveNote() {
