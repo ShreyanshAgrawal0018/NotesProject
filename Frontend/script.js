@@ -21,9 +21,14 @@ const passwordInput = document.getElementById('passwordInput');
 const userAvatar = document.querySelector('.user-avatar');
 const emptyState = document.getElementById('emptyState');
 const emptyCreateBtn = document.getElementById('emptyCreateBtn');
+const nameInput = document.getElementById('nameInput');
+const authTitle = document.getElementById('authTitle');
+const switchAuthBtn = document.getElementById('switchAuthBtn');
+const authSwitchText = document.getElementById('authSwitchText');
 
 let isDarkMode = false;
 let searchQuery = '';
+let isSignupMode = false;
 
 function createNoteHTML(note) {
     const pinClass = note.pinned ? 'fa-solid fa-thumbtack pinned' : 'fa-solid fa-thumbtack';
@@ -179,6 +184,12 @@ fabBtn.addEventListener('click', () => {
     noteTitleInput.focus();
 });
 
+emptyCreateBtn.addEventListener('click', () => {
+    addNoteModal.classList.remove('hidden');
+    fabBtn.style.display = 'none';
+    noteTitleInput.focus();
+});
+
 closeModalBtn.addEventListener('click', () => {
     addNoteModal.classList.add('hidden');
     fabBtn.style.display = 'block';
@@ -199,33 +210,62 @@ userAvatar.addEventListener('click', () => {
 });
 
 loginBtn.addEventListener('click', async () => {
+    const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
+    const url = isSignupMode
+        ? 'http://localhost:5000/signup'
+        : 'http://localhost:5000/login';
+
+    const bodyData = isSignupMode
+        ? { name, email, password }
+        : { email, password };
+
     try {
-        const response = await fetch('http://localhost:5000/login', {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                email,
-                password
-            })
+            body: JSON.stringify(bodyData)
         });
 
         const data = await response.json();
 
         if (response.ok) {
-            localStorage.setItem('token', data.token);
-            alert('Login successful');
-            authModal.classList.add('hidden');
-            loadNotes();
+            alert(data.message);
+
+            if (isSignupMode) {
+                switchAuthBtn.click();
+            } else {
+                localStorage.setItem('token', data.token);
+                authModal.classList.add('hidden');
+                loadNotes();
+            }
         } else {
             alert(data.message);
         }
     } catch (error) {
         console.error(error);
         alert('Error connecting to server');
+    }
+});
+
+switchAuthBtn.addEventListener('click', () => {
+    isSignupMode = !isSignupMode;
+
+    if (isSignupMode) {
+        authTitle.textContent = 'Sign Up';
+        nameInput.classList.remove('hidden');
+        loginBtn.textContent = 'Sign Up';
+        authSwitchText.textContent = 'Already have an account?';
+        switchAuthBtn.textContent = 'Login';
+    } else {
+        authTitle.textContent = 'Login';
+        nameInput.classList.add('hidden');
+        loginBtn.textContent = 'Login';
+        authSwitchText.textContent = 'New user?';
+        switchAuthBtn.textContent = 'Sign Up';
     }
 });

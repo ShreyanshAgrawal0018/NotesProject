@@ -73,14 +73,22 @@
         </footer>
 
     <div id="authModal" class="modal hidden">
-    <div class="modal-header">
-        <h3>Login</h3>
-    </div>
+        <div class="modal-header">
+            <h3 id="authTitle">Login</h3>
+        </div>
 
-    <input type="email" id="emailInput" placeholder="Email">
-    <input type="password" id="passwordInput" placeholder="Password">
+        <input type="text" id="nameInput" placeholder="Name" class="hidden">
 
-    <button id="loginBtn" class="save-btn">Login</button>
+        <input type="email" id="emailInput" placeholder="Email">
+
+        <input type="password" id="passwordInput" placeholder="Password">
+
+        <button id="loginBtn" class="save-btn">Login</button>
+
+        <div class="auth-switch-text">
+            <span id="authSwitchText">New user?</span>
+            <button id="switchAuthBtn" class="auth-link">Sign Up</button>
+        </div>
     </div>
 
     <script src="script.js"></script>

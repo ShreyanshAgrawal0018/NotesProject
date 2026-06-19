@@ -432,3 +432,27 @@ body.dark-mode .empty-state {
     background-color: #1f2937;
     border-color: #374151;
 }
+
+.auth-switch-text {
+    text-align: center;
+    margin-top: 1rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.auth-link {
+    border: none;
+    background: none;
+    color: #15803d;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
