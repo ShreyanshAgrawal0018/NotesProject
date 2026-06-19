@@ -456,3 +456,23 @@ body.dark-mode .empty-state {
 .auth-link:hover {
     text-decoration: underline;
 }
+
+.edit-btn {
+    background: none;
+    border: none;
+    outline: none;
+    color: #840606;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+}
+
+.edit-btn:hover {
+    color: #840606;
+}
+
+.note-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}

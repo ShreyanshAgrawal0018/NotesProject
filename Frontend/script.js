@@ -29,6 +29,7 @@ const authSwitchText = document.getElementById('authSwitchText');
 let isDarkMode = false;
 let searchQuery = '';
 let isSignupMode = false;
+let editingNoteId = null;
 
 function createNoteHTML(note) {
     const pinClass = note.pinned ? 'fa-solid fa-thumbtack pinned' : 'fa-solid fa-thumbtack';
@@ -37,16 +38,22 @@ function createNoteHTML(note) {
         <div class="note-card ${note.colorClass}">
             <div class="note-header">
                 <h3>${note.title}</h3>
-                <button class="pin-btn ${note.pinned ? 'pinned' : ''}" onclick="togglePin('${note.id}')">
+                <button class="pin-btn ${note.pinned ? 'pinned' : ''}" onclick="togglePin(${note.id})">
                     <i class="${pinClass}"></i>
                 </button>
             </div>
             <p class="note-content">${note.content}</p>
             <div class="note-footer">
                 <span class="note-date">${note.date}</span>
-                <button class="delete-btn" onclick="deleteNote('${note.id}')">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <div class="note-actions">
+                    <button class="edit-btn" onclick="editNote('${note.id}')">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <button class="delete-btn" onclick="deleteNote('${note.id}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div> 
             </div>
         </div>
     `;
@@ -130,7 +137,6 @@ window.togglePin = function(id) {
 
 window.deleteNote = async function(id) {
     console.log("Deleting note id:", id);
-
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -162,6 +168,20 @@ window.deleteNote = async function(id) {
     }
 };
 
+window.editNote = function(id) {
+    const note = notes.find(n => n.id === id);
+
+    if (!note) return;
+
+    editingNoteId = id;
+
+    noteTitleInput.value = note.title;
+    noteContentInput.value = note.content;
+
+    addNoteModal.classList.remove('hidden');
+    fabBtn.style.display = 'none';
+};
+
 async function saveNote() {
     const title = noteTitleInput.value.trim();
     const content = noteContentInput.value.trim();
@@ -176,8 +196,14 @@ async function saveNote() {
     }
 
     try {
-        const response = await fetch('https://noteit-backend-ekdi.onrender.com/notes', {
-            method: 'POST',
+        const url = editingNoteId
+            ? `https://noteit-backend-ekdi.onrender.com/notes/${editingNoteId}`
+            : 'https://noteit-backend-ekdi.onrender.com/notes';
+
+        const method = editingNoteId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': token
@@ -195,6 +221,7 @@ async function saveNote() {
             noteContentInput.value = '';
             addNoteModal.classList.add('hidden');
             fabBtn.style.display = 'block';
+            editingNoteId = null;
 
             loadNotes();
         } else {
